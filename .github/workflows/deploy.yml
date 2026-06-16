@@ -25,6 +25,11 @@ jobs:
       run: |
         echo "Sanitising logs - removing PII fields: client_ip, session_token, user_id"
         # Add your actual log scrubbing here if you log those fields
+    -  name: Set kubectl context
+       run: |
+        mkdir -p $HOME/.kube
+        echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
+    # Only needed if you have a real cluster. Skip if using Minikube locally    
     - name: Deploy to environment
       env:
         DATABASE_URL: ${{ secrets.DATABASE_URL_PRD }}
