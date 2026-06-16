@@ -1,0 +1,45 @@
+Application to containerise
+
+The application is a lightweight Node.js API service. Source code: github.com/nexacloud-
+systems/nexacloud-api Branch: main
+
+⚠️CHECK THIS: The Dockerfile was written by Dev but never built successfully.
+Last error he noted (Slack, 22 April): "pg module install failing — might be node
+version issue" Start by running docker build and reading the error before assuming
+the Dockerfile is correct.
+Dockerfile (Dev's version — unverified)
+
+⚠️CHECK THIS: This Dockerfile has not been tested end-to-end. Verify the build
+works before moving to Kubernetes deployment.
+Kubernetes cluster
+Dev installed Minikube locally. No cluster config was saved or documented.
+
+⚠️NOT DOCUMENTED: No namespace was created. No resource limits were set. No
+persistent volume claims exist. The k8s/ deployment files reference: image: nexacloud-
+/
+app.js ← Express server, port 3000
+package.json ← dependencies: express, pg (PostgreSQL client)
+Dockerfile ← EXISTS but NOT TESTED
+k8s/
+deployment.yaml ← EXISTS — NOT TESTED
+service.yaml ← EXISTS — NOT TESTED
+
+dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["node", "app.js"]
+
+# Dev's note (found in a sticky note photo on Slack, 21 April):
+# "minikube start --driver=docker worked on my machine.
+# kubectl get nodes showed Ready. That's all I got working."
+
+api:latest This image must exist in your local Docker registry before k8s can pull it. Run
+docker build -t nexacloud-api:latest . before applying manifests.
+Required Kubernetes outputs (for simulation submission)
+kubectl get pods — all pods must show Running status
+Pod name (format: nexacloud-api-<random-suffix> ) — generated on deployment
+kubectl get services — service must show an accessible NodePort or ClusterIP This is what I want to do
