@@ -36,4 +36,4 @@ jobs:
       run: |
         echo "Deploying to production"
         # GDPR/ICO Nov 2024: Never echo secrets or PII to logs
-        kubectl apply -f k8s/ --validate=false
+        kubectl apply -f k8s/ --validate=false --server-dry-run=client 
