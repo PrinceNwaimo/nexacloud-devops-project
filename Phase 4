@@ -1,0 +1,45 @@
+Got you. Here’s the full “run the project” steps from your folder `nexacloud-devops-project`:
+
+### Steps to run locally with Minikube + Docker
+
+*1. Start Minikube* 
+minikube start --driver=docker
+Wait for “Done! kubectl is now configured”
+
+*2. Point Docker to Minikube’s Docker daemon*
+eval $(minikube docker-env)
+This makes `docker build` put images where Minikube can see them.
+
+*3. Build the image*
+docker build -t nexacloud-api:latest .
+You should see `Successfully tagged nexacloud-api:latest`
+
+*4. Deploy to Kubernetes*
+kubectl apply -f k8s/
+Output: `deployment.apps/nexacloud-api created` + `service/nexacloud-api-service created`
+
+*5. Check it’s running*
+kubectl get pods
+kubectl get services
+You want pod status `Running 1/1` and service type `NodePort 80:30080/TCP`
+
+*6. Test the app in browser*
+minikube service nexacloud-api-service
+This opens `http://localhost:30080` → should show “NexaCloud API Running”
+
+*7. View logs if needed*
+kubectl logs deployment/nexacloud-api
+### Stop/cleanup when done
+kubectl delete -f k8s/
+minikube stop
+*File structure you need in the folder:*
+nexacloud-devops-project/
+├── Dockerfile
+├── package.json  
+├── server.js
+└── k8s/
+    ├── deployment.yaml
+    └── service.yaml
+Run step 1-6 and paste me `kubectl get pods` again if you want me to confirm it’s still green.
+
+You doing this for the simulation screenshots or for actual testing?
