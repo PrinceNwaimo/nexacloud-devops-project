@@ -1,0 +1,54 @@
+write a Terraform configuration provisioning an EC2 t2.micro instance on AWS in eu-west-1 with an S3 remote backend, then run terraform plan and terraform apply
+Steps
+1
+Open your terminal. If Terraform is not installed, go to developer.hashicorp.com/terraform/install first.
+You will see: Your terminal prompt
+2
+In your GitHub repository, navigate to the /terraform/ folder. Create main.tf with: provider 'aws' block (region = eu-west-1), aws_vpc resource, aws_subnet resource, aws_internet_gateway, aws_security_group (ports 22 and 80), and aws_instance resource (ami = ami-0694d931cee176e7d for eu-west-1 Amazon Linux 2, instance_type = t2.micro).
+You will see: main.tf file created in your editor
+
+3
+Create backend.tf with an S3 backend block. Choose a bucket name like nexacloud-tf-state-[your-initials]-2025. Create this bucket in AWS S3 first (same region, versioning enabled), then reference it in backend.tf.
+
+You will see: backend.tf with your S3 bucket name
+
+4
+Run: terraform init. This downloads the AWS provider and connects to your S3 backend.
+
+You will see: Terraform has been successfully initialized
+
+5
+Run: terraform plan. Read the output carefully — it should show resources to add with no errors.
+
+You will see: Plan: N to add, 0 to change, 0 to destroy
+
+6
+Run: terraform apply and type yes when prompted. Wait for completion.
+
+You will see: Apply complete! Resources: N added
+
+7
+Copy your EC2 instance ID from the apply output or from the AWS Console (EC2 → Instances). It starts with i-0 and is 17 characters long. Paste it into your submission.
+
+You will see: Instance ID in format: i-0xxxxxxxxxxxxxxxxx
+solution
+1. AWS configure
+Get AWS Access keys:Log in to AWS Console → https://console.aws.amazon.comClick your username top-right → Security credentialsScroll to "Access keys" section → Click Create access keyChoose use case: Select Command Line Interface CLI if you’re using Terraform/CLI. Click NextDescription tag: Optional, e.g. terraform-laptop. Click Create access keyCopy both keys now:Access key ID = AKIA... 20 charsSecret access key = long random stringImportant: You can only see the Secret key once. Click Download.csv file to save it, or copy/paste immediately. If you lose it, you’ll have to create a new key.
+2. Create S3 bucket for remote state firstTerraform needs the bucket to exist before init. Run once:bashaws s3api create-bucket \
+  --bucket nexacloud-tf-state-ab-2026 \
+  --region eu-west-1 \
+  --create-bucket-configuration LocationConstraint=eu-west-1
+
+aws s3api put-bucket-versioning \
+  --bucket nexacloud-tf-state-ab-2026 \
+  --versioning-configuration Status=EnabledReplace ab with your initials. Bucket names must be globally unique.
+3.Create /terraform/ folder + filesbashmkdir terraform && cd terraform
+4.nano main.tf to create a mani.tf file in your terraform folder
+5.Terraform init
+6. Terraform plan
+7. Terraform apply
+8. Terraform destroy to destroy the infrastructure.
+
+Good. Infrastructure is in place.
+
+Next: containerise the API and get it running on Kubernetes. The Dockerfile exists in the repo but Dev flagged it as untested. Start with a docker build and read whatever error you get before assuming his config is correct.
